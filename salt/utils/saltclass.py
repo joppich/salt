@@ -64,6 +64,18 @@ def get_class(_class, salt_data):
     if sub_init in l_files:
         return render_yaml(sub_init, salt_data)
 
+    segments = _class.split(".")
+    d_saltclass = os.path.join(saltclass_path,"classes")
+    for index, segment in enumerate(segments):
+        d_scope = os.path.join(d_saltclass, "/".join(segments[:index]))
+        if os.path.exists(d_scope) and os.path.isdir(d_scope):
+            f_sub = os.path.join(d_scope, "{0}.yml".format(".".join(segments[index:])))
+            f_sub_init = os.path.join(d_scope, "{0}/init.yml".format(".".join(segments[index:])))
+            if os.path.exists(f_sub) and os.path.isfile(f_sub):
+                return render_yaml(f_sub, salt_data)
+            if os.path.exists(f_sub_init) and os.path.isfile(f_sub_init):
+                return render_yaml(f_sub_init, salt_data)
+
     log.warning('%s: Class definition not found', _class)
     return {}
 
